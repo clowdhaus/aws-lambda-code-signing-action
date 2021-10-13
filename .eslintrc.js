@@ -1,0 +1,21 @@
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:prettier/recommended'
+  ],
+  parserOptions: {
+    ecmaVersion: 2019,
+    sourceType: 'module'
+  },
+  rules: {
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true
+      }
+    ],
+    'eol-last': ['error', 'always']
+  }
+}
