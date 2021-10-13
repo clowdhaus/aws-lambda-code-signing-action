@@ -1,7 +1,7 @@
 {
   "name": "aws-lambda-code-signing-action",
   "version": "0.0.0",
-  "description": "GitHub action which uses AWS Code Signer to sign 🔒 AWS Lambda artifacts 📦 from your pipeline",
+  "description": "GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦 from your pipeline",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clowdhaus/aws-lambda-code-signing-action.git"

@@ -26,11 +26,21 @@ provider "aws" {
 ################################################################################
 
 locals {
+  account_id  = data.aws_caller_identity.current.account_id
+  region      = data.aws_region.current.name
   environment = "dev"
-  project     = "clowdhaus/aws-lambda-code-signing-action"
+  project     = "aws-lambda-code-signing-action"
 
-  base_tags = {
-    Repository  = "https://github.com/${local.project}"
+  tags = {
+    Repository  = "https://github.com/clowdhaus/${local.project}"
     Environment = local.environment
   }
 }
+
+################################################################################
+# Common Data
+################################################################################
+
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}

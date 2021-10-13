@@ -19,7 +19,7 @@
   </a>
 </p>
 
-GitHub action which uses AWS Code Signer to sign 🔒 AWS Lambda artifacts 📦 from your pipeline.
+GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦 from your pipeline.
 
 ## Usage
 
