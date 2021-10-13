@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/aws-lambda-code-signing.png" alt="AWS Lambda Code Signing" width="50%>
+  <img src=".github/aws-lambda-code-signing.png" alt="AWS Lambda Code Signing" width="50%">
 </p>
 <h1 style="font-size: 56px; margin: 0; padding: 0;" align="center">
   aws-lambda-code-signing-action
