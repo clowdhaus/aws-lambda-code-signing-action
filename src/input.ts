@@ -34,7 +34,7 @@ function convertToBoolean(input: string): boolean {
   return input.toLowerCase() === 'true';
 }
 
-// Handles all input validation and type coercion, providing back a "usuable" `Input` object
+// Handles all input validation and type coercion, providing back a "usable" `Input` object
 export function get(): Input {
   try {
     const awsRegion = core.getInput('aws-region', {required: true});

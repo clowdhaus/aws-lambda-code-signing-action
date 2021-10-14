@@ -26,13 +26,13 @@ export default class CodeSigner {
     this.client = new SignerClient({region});
   }
 
-  async createSignedJob(input: StartSigningJobCommandInput): Promise<StartSigningJobResponse> {
-    try {
-      const command = new StartSigningJobCommand(input);
-      const response = await this.client.send(command);
+  async createSignedJob(commandInput: StartSigningJobCommandInput): Promise<StartSigningJobResponse> {
+    const command = new StartSigningJobCommand(commandInput);
+    const destinationPrefix = commandInput.destination?.s3?.prefix;
+    const sourceFileExtension = path.extname(path.basename(commandInput.source?.s3?.key || ''));
 
-      const destinationPrefix = input.destination?.s3?.prefix;
-      const sourceFileExtension = path.extname(path.basename(input.source?.s3?.key || ''));
+    try {
+      const response = await this.client.send(command);
 
       if (response.jobId) {
         core.setOutput('job-id', response.jobId);
@@ -73,13 +73,13 @@ export default class CodeSigner {
     const sourceKey = `${destination.bucketName}/${destination.prefix}${this.jobId}${sourceObjectExtension}`;
     const renamedKey = `${destination.prefix}${sourceObject}`;
 
-    const input: CopyObjectCommandInput = {
+    const commandInput: CopyObjectCommandInput = {
       Bucket: destination.bucketName,
       CopySource: sourceKey,
       Key: renamedKey,
     };
 
-    const command = new CopyObjectCommand(input);
+    const command = new CopyObjectCommand(commandInput);
 
     try {
       const result = await s3Client.send(command);
