@@ -4,15 +4,19 @@ import CodeSigner from './sign';
 import * as input from './input';
 
 async function run(actionInput: input.Input): Promise<void> {
-  try {
-    const signer = await new CodeSigner(actionInput.awsRegion);
-    const createSignedJob = await signer.createSignedJob(actionInput.jobCommandInput);
-    if (createSignedJob && createSignedJob.jobId) {
-      core.debug(`createSignedJob: ${createSignedJob.jobId}`);
-    }
+  const signer = new CodeSigner(actionInput.awsRegion);
 
-    if (createSignedJob && createSignedJob.jobId && actionInput.waitUntilSuccessful) {
-      await signer.waitUntilSuccessful(actionInput.maxWaitTime, createSignedJob.jobId);
+  try {
+    await signer.createSignedJob(actionInput.jobCommandInput);
+
+    // Both options require waiting for signing job to finish
+    if (actionInput.waitUntilSuccessful || actionInput.renameSignedObject) {
+      await signer.waitUntilSuccessful(actionInput.maxWaitTime);
+
+      if (actionInput.renameSignedObject) {
+        const renameResult = await signer.renameSignedObject(actionInput.source, actionInput.destination);
+        core.debug(`renameResult: ${JSON.stringify(renameResult, null, 4)}`);
+      }
     }
   } catch (error) {
     core.setFailed(JSON.stringify(error, null, 4));

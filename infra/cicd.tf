@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "signer" {
   statement {
     sid = "S3List"
     actions = [
-      "s3:GetObjectVersion",
+      "s3:GetObject*",
       "s3:PutObject",
       "s3:ListBucket",
       "s3:ListBucketVersions",
@@ -80,6 +80,17 @@ data "aws_iam_policy_document" "signer" {
     ]
     resources = [aws_signer_signing_profile.this.arn]
   }
+
+  # Required for waiting for job
+  statement {
+    sid = "CheckJobStatus"
+    actions = [
+      "signer:DescribeSigningJob",
+      "signer:ListSigningJobs",
+    ]
+    resources = ["arn:aws:signer:${local.region}:${local.account_id}:/signing-jobs/*"]
+  }
+
 }
 
 resource "aws_iam_role_policy" "signer" {

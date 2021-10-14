@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {
   SignerClient,
   StartSigningJobCommand,
@@ -5,13 +7,16 @@ import {
   StartSigningJobResponse,
   waitUntilSuccessfulSigningJob,
 } from '@aws-sdk/client-signer';
-// import {WaiterState} from '@aws-sdk/util-waiter';
+import {S3Client, CopyObjectCommand, CopyObjectCommandInput, CopyObjectCommandOutput} from '@aws-sdk/client-s3';
 
 import * as core from '@actions/core';
+
+import * as input from './input';
 
 export default class CodeSigner {
   readonly region: string;
   readonly client: SignerClient;
+  private jobId: string;
 
   constructor(region: string) {
     this.region = region;
@@ -21,22 +26,21 @@ export default class CodeSigner {
   async createSignedJob(input: StartSigningJobCommandInput): Promise<StartSigningJobResponse> {
     try {
       const command = new StartSigningJobCommand(input);
-      // core.debug(JSON.stringify(input, null, 4));
-      return await this.client.send(command);
+      const response = await this.client.send(command);
+      if (response.jobId) {
+        core.setOutput('jobId', response.jobId);
+        this.jobId = response.jobId;
+      }
+      return response;
     } catch (error) {
-      const {requestId, cfId, extendedRequestId} = error.$metadata;
-      console.error({requestId, cfId, extendedRequestId});
       core.setFailed(JSON.stringify(error, null, 4));
       throw error;
     }
   }
 
-  async waitUntilSuccessful(maxWaitTime: number, jobId: string): Promise<void> {
+  async waitUntilSuccessful(maxWaitTime: number): Promise<void> {
     const waiterConfig = {client: this.client, minDelay: 1, maxDelay: 10, maxWaitTime};
-    // core.debug(`waiterConfig: ${JSON.stringify(waiterConfig, null, 4)}`);
-
-    const signingJobInput = {jobId};
-    core.debug(`signingJobInput: ${JSON.stringify(signingJobInput, null, 4)}`);
+    const signingJobInput = {jobId: this.jobId};
 
     try {
       const waitResult = await waitUntilSuccessfulSigningJob(waiterConfig, signingJobInput);
@@ -44,20 +48,29 @@ export default class CodeSigner {
     } catch (error) {
       core.setFailed(JSON.stringify(error, null, 4));
     }
-
-    // switch (waitResult.state) {
-    //   case WaiterState.SUCCESS: {
-    //     core.debug(waitResult.reason);
-    //     return;
-    //   }
-    //   default: {
-    //     core.setFailed(waitResult.reason);
-    //     return;
-    //   }
-    // }
   }
 
-  static async renameSignedObject(): Promise<void> {
-    return;
+  async renameSignedObject(source: input.Source, destination: input.Destination): Promise<CopyObjectCommandOutput> {
+    const s3Client = new S3Client({region: this.region});
+
+    const sourceObject = path.basename(source.key);
+    const sourceObjectExtension = path.extname(sourceObject);
+
+    const input: CopyObjectCommandInput = {
+      Bucket: destination.bucketName,
+      // no `/` between <prefix> & <jobId> because its all specified by user in <prefix>
+      // <sourceObjectExtension> required to re-add to signed object created, we only get a <jobId> unfortunately
+      CopySource: `${destination.bucketName}/${destination.prefix}${this.jobId}${sourceObjectExtension}`,
+      Key: `${destination.prefix}${sourceObject}`,
+    };
+
+    const command = new CopyObjectCommand(input);
+
+    try {
+      return await s3Client.send(command);
+    } catch (error) {
+      core.setFailed(JSON.stringify(error, null, 4));
+      throw error;
+    }
   }
 }

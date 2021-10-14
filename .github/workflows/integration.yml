@@ -48,7 +48,8 @@ jobs:
           destination-s3-prefix: signed/
           profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
           wait-until-successful: true
-          max-wait-time: 120
+          max-wait-time: 60
+          rename-signed-object: true
 
       # - name: Start signing job
       #   run: |

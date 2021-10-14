@@ -5,9 +5,22 @@
 import * as core from '@actions/core';
 import {StartSigningJobCommandInput} from '@aws-sdk/client-signer';
 
+export interface Source {
+  bucketName: string;
+  key: string;
+  version: string;
+}
+
+export interface Destination {
+  bucketName: string;
+  prefix: string;
+}
+
 export interface Input {
   awsRegion: string;
   clientRequestToken?: string;
+  source: Source;
+  destination: Destination;
   jobCommandInput: StartSigningJobCommandInput;
   renameSignedObject: boolean;
   waitUntilSuccessful: boolean;
@@ -19,7 +32,7 @@ function convertToBoolean(input: string): boolean {
   return input.toLowerCase() === 'true';
 }
 
-export function get(): Input | undefined {
+export function get(): Input {
   try {
     const awsRegion = core.getInput('aws-region', {required: true});
     const clientRequestToken = core.getInput('client-request-token', {required: false});
@@ -35,20 +48,20 @@ export function get(): Input | undefined {
     const waitUntilSuccessful = convertToBoolean(core.getInput('wait-until-successful', {required: false}));
     const maxWaitTime = parseInt(core.getInput('max-wait-time', {required: false}));
 
+    const source: Source = {
+      bucketName: sourceS3Bucket,
+      key: sourceS3Key,
+      version: sourceS3Version,
+    };
+
+    const destination: Destination = {
+      bucketName: destinationS3Bucket,
+      prefix: destinationS3Prefix,
+    };
+
     const jobCommandInput: StartSigningJobCommandInput = {
-      source: {
-        s3: {
-          bucketName: sourceS3Bucket,
-          key: sourceS3Key,
-          version: sourceS3Version,
-        },
-      },
-      destination: {
-        s3: {
-          bucketName: destinationS3Bucket,
-          prefix: destinationS3Prefix,
-        },
-      },
+      source: {s3: source},
+      destination: {s3: destination},
       profileName: profileName,
       ...(profileOwner ? {profileName: profileName} : {}),
     };
@@ -56,6 +69,8 @@ export function get(): Input | undefined {
     return {
       awsRegion,
       clientRequestToken,
+      source,
+      destination,
       jobCommandInput,
       renameSignedObject,
       waitUntilSuccessful,
@@ -63,6 +78,6 @@ export function get(): Input | undefined {
     };
   } catch (error) {
     core.setFailed((<Error>error).message);
-    return;
+    throw error;
   }
 }

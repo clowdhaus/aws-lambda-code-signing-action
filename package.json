@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.6.0",
+    "@aws-sdk/client-s3": "^3.36.1",
     "@aws-sdk/client-signer": "^3.36.1"
   },
   "devDependencies": {
@@ -54,9 +55,6 @@
   "resolutions": {
     "ansi-regex": "^5.0.1",
     "merge": ">=2.1.1"
-  },
-  "engines": {
-    "node": "~12"
   },
   "config": {
     "commitizen": {
