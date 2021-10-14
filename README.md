@@ -34,7 +34,7 @@ GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts �
 
 See the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) for more details related to code signing AWS Lambda artifacts.
 
-:info: The artifact must already exist in AWS S3 in order for the action to initiate a signing job request; the action does not handle uploading a local artifact to AWS S3 (at this time) before initiating a signing job request.
+ℹ️ The artifact must already exist in AWS S3 in order for the action to initiate a signing job request; the action does not handle uploading a local artifact to AWS S3 (at this time) before initiating a signing job request.
 
 ### Sign
 
