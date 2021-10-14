@@ -1,5 +1,5 @@
 /**
- * Parse action input into a some proper thing.
+ * Parse action input into some proper thing
  */
 
 import * as core from '@actions/core';

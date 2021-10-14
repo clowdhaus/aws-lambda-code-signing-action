@@ -19,11 +19,22 @@
   </a>
 </p>
 
-GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦 from your pipeline.
+GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦
+
+| Functionality                                                                 | Status |
+| ----------------------------------------------------------------------------- | :----: |
+| Create AWS Signer signing request for existing object in source AWS S3 bucket |   ✅   |
+| Wait for signing job to complete                                              |   ✅   |
+| Rename signed object to original/friendly name under destination prefix       |   ✅   |
+| Copy tags from original object to signed object                               |        |
+| Upload local artifact from CI pipeline to AWS S3 source bucket                |        |
+| Generate zip archive for upload to AWS S3 source bucket                       |        |
 
 ## Usage
 
 See the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) for more details related to code signing AWS Lambda artifacts.
+
+:info: The artifact must already exist in AWS S3 in order for the action to initiate a signing job request; the action does not handle uploading a local artifact to AWS S3 (at this time) before initiating a signing job request.
 
 ### Sign
 
@@ -78,6 +89,7 @@ jobs:
 ### Sign & Rename
 
 The following configuration will create a signing job, wait for the job to finish, and then rename the signed object from the AWS Signer output of `<job-id>.<source-file-extension>` to `<destination-s3-prefix>/<source-file-name-and-extension>`. Given the configuration below, there would be two signed artifacts created:
+
 1. `<job-id>.zip` created by the AWS Signer job
 2. `signed/dist.zip` created by the action (using `rename-signed-object: true`)
 
