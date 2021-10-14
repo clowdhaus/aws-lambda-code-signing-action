@@ -15,28 +15,26 @@ inputs:
       the first that use this token return the same response as the first call
     required: false
   source-s3-bucket:
-    description: Source S3 bucket name
+    description: The S3 bucket that contains the object to sign
     required: true
   source-s3-key:
-    description: Source S3 object key
+    description: Key name of the bucket object that contains your unsigned code
     required: true
   source-s3-version:
-    description: Source S3 object version
+    description: Version of your source image in your version enabled S3 bucket
     required: true
   destination-s3-bucket:
-    description: Destination S3 bucket name
+    description: The S3 bucket in which to save your signed object
     required: true
   destination-s3-prefix:
-    description: Destination S3 object key prefix
+    description: S3 object key prefix to prepend to your signed object
     required: false
     default: 'signed/'
   profile-name:
-    description: >-
-      Name of the signing profile to use for signing
+    description: The name of the signing profile
     required: true
   profile-owner:
-    description: >-
-      The AWS account ID of the signing profile owner
+    description: The AWS account ID of the signing profile owner
     required: false
   rename-signed-object:
     description: >-
@@ -45,15 +43,22 @@ inputs:
     required: false
     default: 'true'
   wait-until-successful:
-    description: >-
-      Wait until the signed jobs complete successfully
+    description: Wait until the signed jobs complete successfully
     required: false
     default: 'true'
   max-wait-time:
     description: >-
-      Maximum amount of time, in seconds, to wait for a job to completely successfully
+      Maximum amount of time, in seconds, to wait for a job to complete successfully
     required: false
     default: '30'
+
+outputs:
+  job-id:
+    description: The ID of your signing job
+  signed-object-key:
+    description: The S3 key of your signed object, as created by AWS Signer
+  renamed-signed-object-key:
+    description: The renamed S3 key of your signed object
 
 runs:
   using: 'node12'

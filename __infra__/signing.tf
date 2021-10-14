@@ -1,4 +1,74 @@
 ################################################################################
+# Signer IAM role
+# Used within the CI/CD process - i.e. used by this action in a workflow
+################################################################################
+
+data "aws_iam_policy_document" "signer_assume" {
+  statement {
+    sid = "AssumeRole"
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_user.cicd.arn]
+    }
+  }
+}
+
+resource "aws_iam_role" "signer" {
+  name                  = "${local.project}-signer"
+  description           = "IAM role used for signing Lambda artifacts"
+  assume_role_policy    = data.aws_iam_policy_document.signer_assume.json
+  force_detach_policies = true
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "signer" {
+  statement {
+    sid = "S3List"
+    actions = [
+      "s3:GetObject*",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:ListBucketVersions",
+    ]
+    resources = [
+      module.signing_test_bucket.s3_bucket_arn,
+      "${module.signing_test_bucket.s3_bucket_arn}/*",
+    ]
+  }
+
+  statement {
+    sid = "Sign"
+    actions = [
+      "signer:GetSigningProfile",
+      "signer:StartSigningJob",
+    ]
+    resources = [aws_signer_signing_profile.this.arn]
+  }
+
+  # Required for waiting on job to finish successfully
+  statement {
+    sid = "CheckJobStatus"
+    actions = [
+      "signer:DescribeSigningJob",
+      "signer:ListSigningJobs",
+    ]
+    resources = ["arn:aws:signer:${local.region}:${local.account_id}:/signing-jobs/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "signer" {
+  name   = "${local.project}-signer"
+  role   = aws_iam_role.signer.id
+  policy = data.aws_iam_policy_document.signer.json
+}
+
+################################################################################
 # Signing Config + Profile + Permissions
 ################################################################################
 
@@ -86,5 +156,7 @@ resource "aws_s3_bucket_object" "test" {
   key    = "unsigned/${data.archive_file.test.output_path}"
   source = data.archive_file.test.output_path
 
+  # TODO - update action to copy over tags for original artifact
+  # AWS Signer does not carry over object tags onto signed object
   tags = local.tags
 }

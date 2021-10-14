@@ -31,8 +31,12 @@ export default class CodeSigner {
       const command = new StartSigningJobCommand(input);
       const response = await this.client.send(command);
 
+      const destinationPrefix = input.destination?.s3?.prefix;
+      const sourceFileExtension = path.extname(path.basename(input.source?.s3?.key || ''));
+
       if (response.jobId) {
-        core.setOutput('jobId', response.jobId);
+        core.setOutput('job-id', response.jobId);
+        core.setOutput('signed-object-key', `${destinationPrefix}${response.jobId}${sourceFileExtension}`);
         this.jobId = response.jobId;
         return response; // currently not utilized elsewhere
       }
@@ -64,18 +68,23 @@ export default class CodeSigner {
     const sourceObject = path.basename(source.key);
     const sourceObjectExtension = path.extname(sourceObject);
 
+    // no `/` between <prefix> & <jobId> because its all specified by user in <prefix>
+    // <sourceObjectExtension> required to re-add to signed object created, we only get a <jobId> unfortunately
+    const sourceKey = `${destination.bucketName}/${destination.prefix}${this.jobId}${sourceObjectExtension}`;
+    const renamedKey = `${destination.prefix}${sourceObject}`;
+
     const input: CopyObjectCommandInput = {
       Bucket: destination.bucketName,
-      // no `/` between <prefix> & <jobId> because its all specified by user in <prefix>
-      // <sourceObjectExtension> required to re-add to signed object created, we only get a <jobId> unfortunately
-      CopySource: `${destination.bucketName}/${destination.prefix}${this.jobId}${sourceObjectExtension}`,
-      Key: `${destination.prefix}${sourceObject}`,
+      CopySource: sourceKey,
+      Key: renamedKey,
     };
 
     const command = new CopyObjectCommand(input);
 
     try {
-      return await s3Client.send(command);
+      const result = await s3Client.send(command);
+      core.setOutput('renamed-signed-object-key', renamedKey);
+      return result;
     } catch (error) {
       core.setFailed(JSON.stringify(error, null, 4));
       throw error;

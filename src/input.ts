@@ -39,13 +39,24 @@ export function get(): Input {
   try {
     const awsRegion = core.getInput('aws-region', {required: true});
     const clientRequestToken = core.getInput('client-request-token', {required: false});
+    if (clientRequestToken) core.setSecret(clientRequestToken);
+
     const sourceS3Bucket = core.getInput('source-s3-bucket', {required: true});
+    core.setSecret(sourceS3Bucket);
+
     const sourceS3Key = core.getInput('source-s3-key', {required: true});
     const sourceS3Version = core.getInput('source-s3-version', {required: true});
+
     const destinationS3Bucket = core.getInput('destination-s3-bucket', {required: true});
+    core.setSecret(destinationS3Bucket);
+
     const destinationS3Prefix = core.getInput('destination-s3-prefix', {required: true});
+
     const profileName = core.getInput('profile-name', {required: false});
+    if (profileName) core.setSecret(profileName);
+
     const profileOwner = core.getInput('profile-owner', {required: false});
+    if (profileOwner) core.setSecret(profileOwner);
 
     const renameSignedObject = convertToBoolean(core.getInput('rename-signed-object', {required: false}));
     const waitUntilSuccessful = convertToBoolean(core.getInput('wait-until-successful', {required: false}));

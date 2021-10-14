@@ -14,10 +14,7 @@ on:
 jobs:
   e2e:
     name: End-to-end test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,8 +34,9 @@ jobs:
           LATEST_VERSION=$(aws s3api list-object-versions --bucket ${{ secrets.AWS_S3_BUCKET }} --prefix unsigned/dist.zip --query 'Versions[?IsLatest].[VersionId]' --output text)
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 
-      - name: Test
+      - name: Test action
         uses: ./
+        id: signed
         with:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
           source-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
@@ -47,6 +45,11 @@ jobs:
           destination-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
           destination-s3-prefix: signed/
           profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
-          wait-until-successful: true
           max-wait-time: 60
           rename-signed-object: true
+
+      - name: Test outputs
+        run: |
+          echo "${{ steps.signed.outputs.job-id }}"
+          echo "${{ steps.signed.outputs.signed-object-key }}"
+          echo "${{ steps.signed.outputs.renamed-signed-object-key }}"

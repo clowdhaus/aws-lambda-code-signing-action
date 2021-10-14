@@ -1,6 +1,13 @@
 # AWS Lambda Code Signing Infrastructure
 
-Configurations in this directory creates resources to support testing, validating, as well as an example base for supporting the `clowdhaus/aws-lambda-code-signing-action`.
+Configurations in this directory creates resources to support testing, validating, as well as an example base for supporting the `clowdhaus/aws-lambda-code-signing-action`:
+- AWS Lambda code signing config
+- AWS Signer signing profile
+- Signing profile permissions for signer
+- IAM role which is authorized to perform signing (as well as carry out functionality defined with this action - wait for successful job completion, rename signed object, etc.)
+- Supporting resources:
+  - IAM user to authenticate action workflow to AWS and assume IAM role for signing
+  - S3 bucket and object for demonstrating signing (bucket is used as both source and destination)
 
 ## Usage
 

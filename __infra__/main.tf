@@ -8,6 +8,7 @@ terraform {
     }
   }
 
+  # Be sure to change to your own backend when running locally
   backend "s3" {
     bucket         = "clowd-haus-terraform-state-us-east-1"
     key            = "aws-lambda-code-signing-action/infra/terraform.tfstate"

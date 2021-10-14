@@ -23,22 +23,95 @@ GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts �
 
 ## Usage
 
-See the [AWS documenation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) for all details related to code signing AWS Lambda artifacts.
+See the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) for more details related to code signing AWS Lambda artifacts.
+
+### Sign
+
+The following is an example of creating a signing job and retrieving the resulting `jobId`.
 
 ```yml
-- uses: clowdhaus/aws-lambda-code-signing-action/@main
-  with:
-    aws-region: us-east-1
-    source-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
-    source-s3-key: unsigned/dist.zip
-    source-s3-version: ${{ env.LATEST_VERSION }}
-    destination-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
-    destination-s3-prefix: signed/
-    profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
-    wait-until-successful: true
-    max-wait-time: 60
-    rename-signed-object: true
+jobs:
+  deploy:
+    name: Upload to Amazon S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sign AWS Lambda artifact
+        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        id: signed
+        with:
+          aws-region: us-east-1
+          source-s3-bucket: source-s3-bucket-us-east-1
+          source-s3-key: unsigned/dist.zip
+          source-s3-version: xtmNOx66ZujPT5G.ihF6p60zz8hF5YAK
+          destination-s3-bucket: destination-s3-bucket-us-east-1 # can re-use same bucket
+          destination-s3-prefix: signed/
+          profile-name: AwsLambdaCodeSigningAction20211013170708789000654321
+
+      - name: Outputs
+        run: |
+          echo "${{ steps.signed.outputs.job-id }}"
+          echo "${{ steps.signed.outputs.signed-object-key }}"
 ```
+
+### Sign & Wait
+
+```yml
+jobs:
+  deploy:
+    name: Upload to Amazon S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sign AWS Lambda artifact
+        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        with:
+          aws-region: us-east-1
+          source-s3-bucket: source-s3-bucket-us-east-1
+          source-s3-key: unsigned/dist.zip
+          source-s3-version: xtmNOx66ZujPT5G.ihF6p60zz8hF5YAK
+          destination-s3-bucket: destination-s3-bucket-us-east-1 # can re-use same bucket
+          destination-s3-prefix: signed/
+          profile-name: AwsLambdaCodeSigningAction20211013170708789000654321
+          wait-until-successful: true
+          max-wait-time: 60
+```
+
+### Sign & Rename
+
+The following configuration will create a signing job, wait for the job to finish, and then rename the signed object from the AWS Signer output of `<job-id>.<source-file-extension>` to `<destination-s3-prefix>/<source-file-name-and-extension>`. Given the configuration below, there would be two signed artifacts created:
+1. `<job-id>.zip` created by the AWS Signer job
+2. `signed/dist.zip` created by the action (using `rename-signed-object: true`)
+
+Because the job must complete successfully before the signed object can be renamed, `wait-until-successful` is not required but it will be treated as though its `true`. Therefore, you can also set the amount of wait time when renaming to give the job more time if necessary.
+
+```yml
+jobs:
+  deploy:
+    name: Upload to Amazon S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sign AWS Lambda artifact & rename signed artifact
+        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        id: signed
+        with:
+          aws-region: us-east-1
+          source-s3-bucket: source-s3-bucket-us-east-1
+          source-s3-key: unsigned/dist.zip
+          source-s3-version: xtmNOx66ZujPT5G.ihF6p60zz8hF5YAK
+          destination-s3-bucket: destination-s3-bucket-us-east-1 # can re-use same bucket
+          destination-s3-prefix: signed/
+          profile-name: AwsLambdaCodeSigningAction20211013170708789000654321
+          max-wait-time: 60
+          rename-signed-object: true
+
+      - name: Outputs
+        run: |
+          echo "${{ steps.signed.outputs.job-id }}"
+          echo "${{ steps.signed.outputs.renamed-signed-object-key }}"
+```
+
+## AWS Signing Resources
+
+See the [`__infra__`](__infra__) directory for example of resource definitions necessary for signing.
 
 ## Getting Started
 
