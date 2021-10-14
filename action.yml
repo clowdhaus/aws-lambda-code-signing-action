@@ -1,11 +1,60 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: AWS Lambda Code Signing GitHub Action
+author: Clowd Haus, LLC
+description: GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦 from your pipeline
+branding:
+  icon: edit
+  color: orange
+
 inputs:
-  milliseconds: # change this
+  aws-region:
+    description: AWS Region, e.g. us-east-2
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  client-request-token:
+    description: >-
+      String that identifies the signing request. All calls after
+      the first that use this token return the same response as the first call
+    required: false
+  source-s3-bucket:
+    description: Source S3 bucket name
+    required: true
+  source-s3-key:
+    description: Source S3 object key
+    required: true
+  source-s3-version:
+    description: Source S3 object version
+    required: true
+  destination-s3-bucket:
+    description: Destination S3 bucket name
+    required: true
+  destination-s3-prefix:
+    description: Destination S3 object key prefix
+    required: false
+    default: 'signed/'
+  profile-name:
+    description: >-
+      Name of the signing profile to use for signing
+    required: true
+  profile-owner:
+    description: >-
+      The AWS account ID of the signing profile owner
+    required: false
+  rename-signed-object:
+    description: >-
+      Rename the generated signed object to match the original
+      `sourceS3Key` with the `destinationS3Prefix`
+    required: false
+    default: 'true'
+  wait-until-successful:
+    description: >-
+      Wait until the signed jobs complete successfully
+    required: false
+    default: 'true'
+  max-wait-time:
+    description: >-
+      Maximum amount of time, in seconds, to wait for a job to completely successfully
+    required: false
+    default: '30'
+
 runs:
   using: 'node12'
   main: 'dist/index.js'

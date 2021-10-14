@@ -1,18 +1,34 @@
 import * as core from '@actions/core';
 
-async function run(): Promise<void> {
+import CodeSigner from './sign';
+import * as input from './input';
+
+async function run(actionInput: input.Input): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds');
-    core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const signer = await new CodeSigner(actionInput.awsRegion);
+    const createSignedJob = await signer.createSignedJob(actionInput.jobCommandInput);
+    if (createSignedJob && createSignedJob.jobId) {
+      core.debug(`createSignedJob: ${createSignedJob.jobId}`);
+    }
 
-    core.debug(new Date().toTimeString());
-    // await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
+    if (createSignedJob && createSignedJob.jobId && actionInput.waitUntilSuccessful) {
+      await signer.waitUntilSuccessful(actionInput.maxWaitTime, createSignedJob.jobId);
+    }
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message);
+    core.setFailed(JSON.stringify(error, null, 4));
   }
 }
 
-run();
+async function main(): Promise<void> {
+  const actionInput = input.get();
+
+  try {
+    if (actionInput) {
+      await run(actionInput);
+    }
+  } catch (error) {
+    core.setFailed((<Error>error).message);
+  }
+}
+
+void main();
