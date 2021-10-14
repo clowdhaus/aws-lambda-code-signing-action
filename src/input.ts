@@ -5,12 +5,14 @@
 import * as core from '@actions/core';
 import {StartSigningJobCommandInput} from '@aws-sdk/client-signer';
 
+// S3 source
 export interface Source {
   bucketName: string;
   key: string;
   version: string;
 }
 
+// S3 destination
 export interface Destination {
   bucketName: string;
   prefix: string;
@@ -32,6 +34,7 @@ function convertToBoolean(input: string): boolean {
   return input.toLowerCase() === 'true';
 }
 
+// Handles all input validation and type coercion, providing back a "usuable" `Input` object
 export function get(): Input {
   try {
     const awsRegion = core.getInput('aws-region', {required: true});
@@ -48,17 +51,20 @@ export function get(): Input {
     const waitUntilSuccessful = convertToBoolean(core.getInput('wait-until-successful', {required: false}));
     const maxWaitTime = parseInt(core.getInput('max-wait-time', {required: false}));
 
+    // S3 source - used in both the signing job and renaming
     const source: Source = {
       bucketName: sourceS3Bucket,
       key: sourceS3Key,
       version: sourceS3Version,
     };
 
+    // S3 destination - used in both signing job and renaming
     const destination: Destination = {
       bucketName: destinationS3Bucket,
       prefix: destinationS3Prefix,
     };
 
+    // Object provided as input to the signing job
     const jobCommandInput: StartSigningJobCommandInput = {
       source: {s3: source},
       destination: {s3: destination},

@@ -1,5 +1,11 @@
-import * as path from 'path';
+/**
+ * AWS Signer w/ ability to rename signed object
+ */
 
+import * as input from './input';
+
+import * as core from '@actions/core';
+import {S3Client, CopyObjectCommand, CopyObjectCommandInput, CopyObjectCommandOutput} from '@aws-sdk/client-s3';
 import {
   SignerClient,
   StartSigningJobCommand,
@@ -7,11 +13,8 @@ import {
   StartSigningJobResponse,
   waitUntilSuccessfulSigningJob,
 } from '@aws-sdk/client-signer';
-import {S3Client, CopyObjectCommand, CopyObjectCommandInput, CopyObjectCommandOutput} from '@aws-sdk/client-s3';
 
-import * as core from '@actions/core';
-
-import * as input from './input';
+import * as path from 'path';
 
 export default class CodeSigner {
   readonly region: string;
@@ -27,11 +30,16 @@ export default class CodeSigner {
     try {
       const command = new StartSigningJobCommand(input);
       const response = await this.client.send(command);
+
       if (response.jobId) {
         core.setOutput('jobId', response.jobId);
         this.jobId = response.jobId;
+        return response; // currently not utilized elsewhere
       }
-      return response;
+
+      // Without `jobId` we cannot (should not) continue
+      core.setFailed(JSON.stringify(response, null, 4));
+      throw '`jobId` not found on `StartSigningJobResponse`';
     } catch (error) {
       core.setFailed(JSON.stringify(error, null, 4));
       throw error;

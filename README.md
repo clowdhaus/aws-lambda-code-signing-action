@@ -28,7 +28,16 @@ See the [AWS documenation](https://docs.aws.amazon.com/lambda/latest/dg/configur
 ```yml
 - uses: clowdhaus/aws-lambda-code-signing-action/@main
   with:
-    # TODO
+    aws-region: us-east-1
+    source-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
+    source-s3-key: unsigned/dist.zip
+    source-s3-version: ${{ env.LATEST_VERSION }}
+    destination-s3-bucket: ${{ secrets.AWS_S3_BUCKET }}
+    destination-s3-prefix: signed/
+    profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
+    wait-until-successful: true
+    max-wait-time: 60
+    rename-signed-object: true
 ```
 
 ## Getting Started

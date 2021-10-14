@@ -1,12 +1,17 @@
-import * as core from '@actions/core';
+/**
+ * Action entrypoint
+ */
 
-import CodeSigner from './sign';
 import * as input from './input';
+import CodeSigner from './sign';
+
+import * as core from '@actions/core';
 
 async function run(actionInput: input.Input): Promise<void> {
   const signer = new CodeSigner(actionInput.awsRegion);
 
   try {
+    // Create signing job
     await signer.createSignedJob(actionInput.jobCommandInput);
 
     // Both options require waiting for signing job to finish
@@ -14,6 +19,7 @@ async function run(actionInput: input.Input): Promise<void> {
       await signer.waitUntilSuccessful(actionInput.maxWaitTime);
 
       if (actionInput.renameSignedObject) {
+        // Rename signed object back to original object name but under signed prefix
         const renameResult = await signer.renameSignedObject(actionInput.source, actionInput.destination);
         core.debug(`renameResult: ${JSON.stringify(renameResult, null, 4)}`);
       }

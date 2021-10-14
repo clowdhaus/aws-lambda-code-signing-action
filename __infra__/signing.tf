@@ -85,4 +85,6 @@ resource "aws_s3_bucket_object" "test" {
   bucket = module.signing_test_bucket.s3_bucket_id
   key    = "unsigned/${data.archive_file.test.output_path}"
   source = data.archive_file.test.output_path
+
+  tags = local.tags
 }
