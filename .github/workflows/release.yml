@@ -30,4 +30,6 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE }}
-        run: yarn release
+        run: |
+          yarn
+          yarn release
