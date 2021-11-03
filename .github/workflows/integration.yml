@@ -13,7 +13,7 @@ on:
 
 jobs:
   e2e:
-    name: End-to-end test
+    name: e2e test
     runs-on: ubuntu-latest
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
