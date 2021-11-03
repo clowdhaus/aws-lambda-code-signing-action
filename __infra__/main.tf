@@ -10,8 +10,8 @@ terraform {
 
   # Be sure to change to your own backend when running locally
   backend "s3" {
-    bucket         = "clowd-haus-terraform-state-us-east-1"
-    key            = "aws-lambda-code-signing-action/infra/terraform.tfstate"
+    bucket         = "clowd-haus-iac-us-east-1"
+    key            = "aws-lambda-code-signing-action/us-east-1/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "clowd-haus-terraform-state"
     encrypt        = true
@@ -30,10 +30,10 @@ locals {
   account_id  = data.aws_caller_identity.current.account_id
   region      = data.aws_region.current.name
   environment = "dev"
-  project     = "aws-lambda-code-signing-action"
+  name        = "aws-lambda-code-signing-action"
 
   tags = {
-    Repository  = "https://github.com/clowdhaus/${local.project}"
+    Repository  = "https://github.com/clowdhaus/${local.name}"
     Environment = local.environment
   }
 }

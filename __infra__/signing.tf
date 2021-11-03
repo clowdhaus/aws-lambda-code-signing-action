@@ -3,23 +3,40 @@
 # Used within the CI/CD process - i.e. used by this action in a workflow
 ################################################################################
 
+data "aws_ssm_parameter" "github_oidc_id" {
+  name = "/iam/github-oidc-provider-id"
+}
+
 data "aws_iam_policy_document" "signer_assume" {
   statement {
-    sid = "AssumeRole"
+    sid    = "GithubOidcAuth"
+    effect = "Allow"
     actions = [
-      "sts:AssumeRole",
       "sts:TagSession",
+      "sts:AssumeRoleWithWebIdentity"
     ]
 
     principals {
-      type        = "AWS"
-      identifiers = [aws_iam_user.cicd.arn]
+      type        = "Federated"
+      identifiers = [data.aws_ssm_parameter.github_oidc_id.value]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:clowdhaus/${local.name}:*"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
     }
   }
 }
 
 resource "aws_iam_role" "signer" {
-  name                  = "${local.project}-signer"
+  name                  = "${local.name}-signer"
   description           = "IAM role used for signing Lambda artifacts"
   assume_role_policy    = data.aws_iam_policy_document.signer_assume.json
   force_detach_policies = true
@@ -63,7 +80,7 @@ data "aws_iam_policy_document" "signer" {
 }
 
 resource "aws_iam_role_policy" "signer" {
-  name   = "${local.project}-signer"
+  name   = "${local.name}-signer"
   role   = aws_iam_role.signer.id
   policy = data.aws_iam_policy_document.signer.json
 }
@@ -73,7 +90,7 @@ resource "aws_iam_role_policy" "signer" {
 ################################################################################
 
 resource "aws_lambda_code_signing_config" "this" {
-  description = "Code signing config for `${local.project}`"
+  description = "Code signing config for `${local.name}`"
 
   allowed_publishers {
     signing_profile_version_arns = [
@@ -118,9 +135,9 @@ resource "aws_signer_signing_profile_permission" "signer_role_start_signing_job"
 
 module "signing_test_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 2.9"
+  version = "~> 2.10"
 
-  bucket = "${local.project}-${local.account_id}-${local.region}"
+  bucket = "${local.name}-${local.account_id}-${local.region}"
   acl    = "private"
 
   attach_deny_insecure_transport_policy = true
