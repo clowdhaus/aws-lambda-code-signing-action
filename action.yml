@@ -61,5 +61,5 @@ outputs:
     description: The renamed S3 key of your signed object
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
