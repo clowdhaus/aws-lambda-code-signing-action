@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.4.1...v1.5.0) (2024-05-05)
+
+
+### Features
+
+* Update action runtime from NodeJS 16 to 20, update dependencies to latest ([cbf2fe5](https://github.com/clowdhaus/aws-lambda-code-signing-action/commit/cbf2fe56cc291cc8fb7fe9b7147a84a800aacc0e))
+
 ## [1.4.1](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.4.0...v1.4.1) (2023-07-18)
 
 
