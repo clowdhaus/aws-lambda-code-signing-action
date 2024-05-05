@@ -94,7 +94,7 @@ export function get(): Input {
       maxWaitTime,
     };
   } catch (error) {
-    core.setFailed((<Error>error).message);
+    core.setFailed((error as Error).message);
     throw error;
   }
 }
