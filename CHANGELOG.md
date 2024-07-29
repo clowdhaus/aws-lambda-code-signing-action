@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.5.0...v1.5.1) (2024-07-29)
+
+
+### Bug Fixes
+
+* Update dependencies to patch reported vulnerability with `fast-xml-parser` ([6f3ef7f](https://github.com/clowdhaus/aws-lambda-code-signing-action/commit/6f3ef7f599715a1ab928a2f143d5c6775d8a4762))
+
 # [1.5.0](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.4.1...v1.5.0) (2024-05-05)
 
 
