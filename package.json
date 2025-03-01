@@ -73,15 +73,15 @@
     "@eslint/js": "^9.2.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@types/node": "^20.12.8",
+    "@types/node": "^22.13.8",
     "@vercel/ncc": "^0.38.1",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.2.0",
     "lint-staged": "^15.2.2",
-    "semantic-release": "^23.0.8",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.8.0"
+    "semantic-release": "^24.2.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.25.0"
   },
   "resolutions": {
     "fast-xml-parser": ">=4.4.1"
