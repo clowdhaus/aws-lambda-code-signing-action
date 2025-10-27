@@ -66,22 +66,22 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@aws-sdk/client-s3": "^3.913.0",
-    "@aws-sdk/client-signer": "^3.913.0"
+    "@aws-sdk/client-s3": "^3.917.0",
+    "@aws-sdk/client-signer": "^3.917.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@types/node": "^24.8.1",
+    "@types/node": "^24.9.1",
     "@vercel/ncc": "^0.38.4",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.38.0",
-    "lint-staged": "^16.2.4",
+    "lint-staged": "^16.2.6",
     "semantic-release": "^25.0.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.1"
+    "typescript-eslint": "^8.46.2"
   },
   "resolutions": {
     "fast-xml-parser": ">=4.4.1"
