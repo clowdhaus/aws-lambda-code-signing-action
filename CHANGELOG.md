@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.5.1...v1.5.2) (2025-10-29)
+
+
+### Bug Fixes
+
+* Update dependencies to patch reported vulnerabilities ([dad02b6](https://github.com/clowdhaus/aws-lambda-code-signing-action/commit/dad02b656e24e70d08a897e69fbb37e83538ae6c))
+
 ## [1.5.1](https://github.com/clowdhaus/aws-lambda-code-signing-action/compare/v1.5.0...v1.5.1) (2024-07-29)
 
 
