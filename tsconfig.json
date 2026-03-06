@@ -2,18 +2,14 @@
   "compilerOptions": {
     "target": "esnext",
     "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "removeComments": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "preserveConstEnums": true,
+    "noImplicitReturns": true
   },
   "include": ["src/*.ts"],
-  "exclude": ["node_modules", "tests"]
+  "exclude": ["node_modules"]
 }

@@ -6,12 +6,6 @@
 </h1>
 <p align="center">
   <img src="https://badgen.net/badge/TypeScript/strict%20%F0%9F%92%AA/blue" alt="Strict TypeScript">
-  <a href="http://commitizen.github.io/cz-cli/" alt="commitizen cli">
-    <img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly">
-  </a>
-  <a href="https://snyk.io/test/github/clowdhaus/aws-lambda-code-signing-action">
-    <img src="https://snyk.io/test/github/clowdhaus/aws-lambda-code-signing-action/badge.svg" alt="Known Vulnerabilities" data-canonical-src="https://snyk.io/test/github/clowdhaus/aws-lambda-code-signing-action">
-  </a>
 </p>
 <p align="center">
   <a href="https://github.com/clowdhaus/aws-lambda-code-signing-action/actions?query=workflow%3Aintegration">
@@ -19,7 +13,7 @@
   </a>
 </p>
 
-GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts 📦
+GitHub action which uses AWS Code Signer to sign AWS Lambda artifacts
 
 | Functionality                                                                 | Status |
 | ----------------------------------------------------------------------------- | :----: |
@@ -34,7 +28,7 @@ GitHub action which uses AWS Code Signer to sign ✍🏼 AWS Lambda artifacts �
 
 See the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html) for more details related to code signing AWS Lambda artifacts.
 
-ℹ️ The artifact must already exist in AWS S3 in order for the action to initiate a signing job request; the action does not handle uploading a local artifact to AWS S3 (at this time) before initiating a signing job request.
+> The artifact must already exist in AWS S3 in order for the action to initiate a signing job request; the action does not handle uploading a local artifact to AWS S3 (at this time) before initiating a signing job request.
 
 ### Sign
 
@@ -47,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sign AWS Lambda artifact
-        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        uses: clowdhaus/aws-lambda-code-signing-action@main
         id: signed
         with:
           aws-region: us-east-1
@@ -73,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sign AWS Lambda artifact
-        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        uses: clowdhaus/aws-lambda-code-signing-action@main
         with:
           aws-region: us-east-1
           source-s3-bucket: source-s3-bucket-us-east-1
@@ -102,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sign AWS Lambda artifact & rename signed artifact
-        uses: clowdhaus/aws-lambda-code-signing-action/@main
+        uses: clowdhaus/aws-lambda-code-signing-action@main
         id: signed
         with:
           aws-region: us-east-1
@@ -131,16 +125,18 @@ The following instructions will help you get setup for development and testing p
 
 ### Prerequisites
 
-#### [yarn](https://github.com/yarnpkg/yarn)
+#### [Node.js](https://nodejs.org/)
 
-`yarn` is used to handle dependencies and executing scripts on the codebase.
-
-See [here](https://yarnpkg.com/en/docs/install#debian-stable) for instructions on installing yarn on your local machine.
-
-Once you have installed `yarn`, you can install the project dependencies by running the following command from within the project root directory:
+Install dependencies:
 
 ```bash
-  $ yarn
+npm install
+```
+
+Build, lint, and test:
+
+```bash
+npm run all
 ```
 
 ## Contributing
@@ -149,4 +145,4 @@ Please read [CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) for details on our 
 
 ## Changelog
 
-Please see the [CHANGELOG.md](CHANGELOG.md) for details on individual releases.
+See [GitHub Releases](https://github.com/clowdhaus/aws-lambda-code-signing-action/releases) for details on individual releases.
