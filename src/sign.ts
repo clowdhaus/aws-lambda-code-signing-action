@@ -1,7 +1,3 @@
-/**
- * AWS Signer w/ ability to rename signed object
- */
-
 import * as input from './input';
 
 import * as core from '@actions/core';
@@ -19,7 +15,7 @@ import * as path from 'path';
 export default class CodeSigner {
   readonly region: string;
   readonly client: SignerClient;
-  private jobId: string;
+  private jobId!: string;
 
   constructor(region: string) {
     this.region = region;
@@ -31,35 +27,24 @@ export default class CodeSigner {
     const destinationPrefix = commandInput.destination?.s3?.prefix;
     const sourceFileExtension = path.extname(path.basename(commandInput.source?.s3?.key || ''));
 
-    try {
-      const response = await this.client.send(command);
+    const response = await this.client.send(command);
 
-      if (response.jobId) {
-        core.setOutput('job-id', response.jobId);
-        core.setOutput('signed-object-key', `${destinationPrefix}${response.jobId}${sourceFileExtension}`);
-        this.jobId = response.jobId;
-        return response; // currently not utilized elsewhere
-      }
-
-      // Without `jobId` we cannot (should not) continue
-      core.setFailed(JSON.stringify(response, null, 4));
-      throw '`jobId` not found on `StartSigningJobResponse`';
-    } catch (error) {
-      core.setFailed(JSON.stringify(error, null, 4));
-      throw error;
+    if (!response.jobId) {
+      throw new Error(`jobId not found on StartSigningJobResponse: ${JSON.stringify(response)}`);
     }
+
+    core.setOutput('job-id', response.jobId);
+    core.setOutput('signed-object-key', `${destinationPrefix}${response.jobId}${sourceFileExtension}`);
+    this.jobId = response.jobId;
+    return response;
   }
 
   async waitUntilSuccessful(maxWaitTime: number): Promise<void> {
     const waiterConfig = {client: this.client, minDelay: 1, maxDelay: 10, maxWaitTime};
     const signingJobInput = {jobId: this.jobId};
 
-    try {
-      const waitResult = await waitUntilSuccessfulSigningJob(waiterConfig, signingJobInput);
-      core.debug(`waitResult: ${JSON.stringify(waitResult, null, 4)}`);
-    } catch (error) {
-      core.setFailed(JSON.stringify(error, null, 4));
-    }
+    const waitResult = await waitUntilSuccessfulSigningJob(waiterConfig, signingJobInput);
+    core.debug(`waitResult: ${JSON.stringify(waitResult, null, 4)}`);
   }
 
   async renameSignedObject(source: input.Source, destination: input.Destination): Promise<CopyObjectCommandOutput> {
@@ -80,14 +65,8 @@ export default class CodeSigner {
     };
 
     const command = new CopyObjectCommand(commandInput);
-
-    try {
-      const result = await s3Client.send(command);
-      core.setOutput('renamed-signed-object-key', renamedKey);
-      return result;
-    } catch (error) {
-      core.setFailed(JSON.stringify(error, null, 4));
-      throw error;
-    }
+    const result = await s3Client.send(command);
+    core.setOutput('renamed-signed-object-key', renamedKey);
+    return result;
   }
 }

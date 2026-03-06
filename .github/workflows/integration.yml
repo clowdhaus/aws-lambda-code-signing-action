@@ -1,30 +1,76 @@
 name: integration
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+      - 'dist/**'
+      - 'src/**'
+      - 'action.yml'
+      - 'package.json'
+      - 'package-lock.json'
   push:
     branches:
       - main
     paths:
-      - '.github/workflows/integration.yml'
+      - '.github/workflows/**'
       - 'dist/**'
       - 'src/**'
       - 'action.yml'
-      - 'yarn.lock'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  verify-build:
+    name: Verify dist is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: 24
+
+      - name: Install and build
+        run: |
+          npm ci --ignore-scripts
+          npm run all
+
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --quiet dist/; then
+            echo "::error::dist/index.js is out of date. Run 'npm run compile' and commit the result."
+            git diff --stat dist/
+            exit 1
+          fi
+
   e2e:
     name: e2e test
     runs-on: ubuntu-latest
-    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
       id-token: write
-      contents: write
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@cabfdba3510de1431bac9dba27511d97497fc100 # v5
         with:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
