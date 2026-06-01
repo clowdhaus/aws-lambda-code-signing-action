@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 3.17" # https://github.com/hashicorp/terraform-provider-aws/blob/main/CHANGELOG.md#3170-november-24-2020
+      version = ">= 6.0"
     }
   }
 
@@ -28,7 +28,7 @@ provider "aws" {
 
 locals {
   account_id  = data.aws_caller_identity.current.account_id
-  region      = data.aws_region.current.name
+  region      = data.aws_region.current.region
   environment = "dev"
   name        = "aws-lambda-code-signing-action"
 
