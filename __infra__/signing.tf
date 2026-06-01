@@ -135,7 +135,7 @@ resource "aws_signer_signing_profile_permission" "signer_role_start_signing_job"
 
 module "signing_test_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 2.10"
+  version = "~> 5.0"
 
   bucket = "${local.name}-${local.account_id}-${local.region}"
   acl    = "private"
@@ -168,7 +168,7 @@ data "archive_file" "test" {
   output_path = "dist.zip"
 }
 
-resource "aws_s3_bucket_object" "test" {
+resource "aws_s3_object" "test" {
   bucket = module.signing_test_bucket.s3_bucket_id
   key    = "unsigned/${data.archive_file.test.output_path}"
   source = data.archive_file.test.output_path
