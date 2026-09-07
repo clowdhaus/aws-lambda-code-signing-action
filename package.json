@@ -29,16 +29,16 @@
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
-    "@aws-sdk/client-s3": "^3.1115.0",
-    "@aws-sdk/client-signer": "^3.1115.0"
+    "@aws-sdk/client-s3": "^3.1126.0",
+    "@aws-sdk/client-signer": "^3.1126.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.1",
     "esbuild": "^0.28.2",
-    "eslint": "^10.8.1",
+    "eslint": "^10.9.1",
     "typescript": "^7.0.2",
-    "typescript-eslint": "^8.67.0",
-    "vitest": "^4.1.11"
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^5.0.0"
   }
 }
